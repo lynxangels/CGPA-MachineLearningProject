@@ -1,6 +1,11 @@
 # 🎓 Analisis Performa Akademik Mahasiswa Melalui Pendekatan Machine Learning
 > Studi Berbasis Data Kebiasaan dan Kondisi Sosial
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?logo=vercel&logoColor=white)](https://cgpa-machinelearningproject-cgpa-da-two.vercel.app/)
+
+### 🔗 Coba langsung: [cgpa-machinelearningproject-cgpa-da-two.vercel.app](https://cgpa-machinelearningproject-cgpa-da-two.vercel.app/)
+
+
 Proyek ini membangun model **Machine Learning berbasis Regresi** untuk memprediksi **CGPA (Cumulative Grade Point Average)** mahasiswa berdasarkan kebiasaan belajar dan kondisi sosial-lingkungan — **tanpa menggunakan riwayat nilai akademik sebelumnya**.
 
 ---
