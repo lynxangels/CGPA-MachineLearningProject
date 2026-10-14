@@ -34,7 +34,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 """Load Data & Cheking Info - Membaca data"""
 
 #Load Data dari excel
-df = pd.read_excel('/content/Students_Performance_data_set (1).xlsx')
+df = pd.read_excel('Students_Performance_data_set (1).xlsx')
 
 df.shape  #melihat ukuran data
 
