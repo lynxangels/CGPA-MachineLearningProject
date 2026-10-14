@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prediksi CGPA Mahasiswa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4F3FB;--surface:#fff;--ink:#1B1F3B;--muted:#5E6385;--line:#DAD9EC;
+--primary:#5B4FE0;--primary-d:#4338B8;--mint:#1FA37F;--amber:#E8A02B;--rose:#D9475F;
+--mint-t:#0E7557;--amber-t:#8F5A00;--rose-t:#A82A42;--mint-bg:#E3F6EF;--amber-bg:#FCF1DC;--rose-bg:#FBE6EA;
+--head:"Bricolage Grotesque",system-ui,sans-serif;--body:"Figtree",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding:clamp(20px,4vw,48px) clamp(16px,3vw,32px) 48px}
+h1{font:800 clamp(1.9rem,4.4vw,3rem)/1.08 var(--head);letter-spacing:-.02em;margin:0 0 12px;max-width:17em}
+.lead{color:var(--muted);max-width:38em;margin:0 0 32px}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(20px,4vw,44px);align-items:start}
+section.group{background:var(--surface);border-radius:18px;padding:24px 26px;margin-bottom:20px;border-left:6px solid var(--primary)}
+section.group.env{border-left-color:var(--mint)}
+h2{font:600 1.25rem/1.2 var(--head);margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 18px}
+.f{margin-bottom:16px}.f:last-child{margin-bottom:0}
+.f label{display:flex;justify-content:space-between;gap:12px;font-weight:500;font-size:.95rem;margin-bottom:6px}
+.f output{color:var(--primary-d);font-weight:600;white-space:nowrap}
+input[type=range]{width:100%;accent-color:var(--primary);margin:0}
+select,input[type=number]{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.btn{width:100%;padding:15px;border:0;border-radius:14px;background:var(--primary);color:#fff;font:600 1.05rem var(--head);cursor:pointer;transition:background .15s,transform .1s}
+.btn:hover{background:var(--primary-d)}.btn:active{transform:scale(.99)}.btn:disabled{opacity:.6;cursor:wait}
+aside{position:sticky;top:20px}
+.result{background:var(--ink);color:#fff;border-radius:22px;padding:26px 24px 24px}
+.result h2{color:#fff}
+.gauge{width:100%;display:block;margin:6px 0 0}
+.needle{transform-origin:120px 120px;transition:transform 1s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.chip{display:inline-block;padding:5px 14px;border-radius:99px;font-weight:600;font-size:.9rem;margin:2px 0 10px}
+.chip.high{background:var(--mint-bg);color:var(--mint-t)}.chip.mid{background:var(--amber-bg);color:var(--amber-t)}.chip.low{background:var(--rose-bg);color:var(--rose-t)}
+.interp{margin:0 0 12px;color:#DCDCF2}
+.tips{margin:0 0 14px;padding-left:20px;color:#fff}.tips li{margin:3px 0}
+.note{font-size:.82rem;color:#A9ABD0;margin:0;border-top:1px solid #343969;padding-top:12px}
+.empty{color:#C4C6E6;margin:0}
+.err{background:var(--rose-bg);color:var(--rose-t);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.92rem}
+@media(max-width:860px){.grid{grid-template-columns:1fr}aside{position:static}.two{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.needle,.btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Seberapa besar kebiasaan belajarmu memengaruhi CGPA?</h1>
+  <p class="lead">Jawab 22 pertanyaan tentang kebiasaan belajar dan kondisi sehari-harimu. Model Random Forest akan memperkirakan CGPA berdasarkan pola dari data survei mahasiswa.</p>
+  <div class="grid">
+    <form id="form" novalidate><div id="groups"></div>
+      <button class="btn" id="go" type="submit">Prediksi CGPA</button>
+      <div id="err" class="err" hidden role="alert"></div>
+    </form>
+    <aside>
+      <div class="result" aria-live="polite">
+        <h2>Hasil prediksi</h2>
+        <svg class="gauge" viewBox="0 0 240 150" role="img" aria-label="Pengukur CGPA dari 0 sampai 4">
+          <g id="arcs" fill="none" stroke-width="16" stroke-linecap="butt"></g>
+          <g id="needle" class="needle" style="opacity:0">
+            <line x1="120" y1="120" x2="38" y2="120" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="120" cy="120" r="7" fill="#fff"/>
+          </g>
+          <text id="num" x="120" y="146" text-anchor="middle" fill="#fff" font-family="Bricolage Grotesque,system-ui" font-weight="800" font-size="30">–</text>
+          <text x="20" y="143" text-anchor="middle" fill="#A9ABD0" font-size="10">0</text>
+          <text x="220" y="143" text-anchor="middle" fill="#A9ABD0" font-size="10">4.0</text>
+        </svg>
+        <div id="out"><p class="empty">Isi formulir, lalu tekan Prediksi CGPA. Hasilnya muncul di sini.</p></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+const YN=[["Yes","Ya"],["No","Tidak"]],NY=[["No","Tidak"],["Yes","Ya"]];
+const R=(k,l,min,max,step,v,u)=>({k,l,t:"range",min,max,step,v,u});
+const S=(k,l,o,v)=>({k,l,t:"select",o,v});
+const GROUPS=[
+{title:"Kebiasaan belajar",sub:"Rutinitas harianmu di kampus dan di rumah.",cls:"",fields:[
+ R("study_hours","Jam belajar per hari",0,12,.5,5," jam"),
+ R("study_sessions","Berapa kali duduk belajar dalam sehari",0,10,1,3,"x"),
+ R("social_media","Jam media sosial per hari",0,10,.5,2," jam"),
+ R("skill_dev","Jam pengembangan skill per hari",0,8,.5,1," jam"),
+ R("attendance","Rata-rata kehadiran kelas",0,100,1,80,"%"),
+ S("learning_mode","Mode belajar yang kamu sukai",[["Online","Online"],["Offline","Offline"],["Blended","Campuran (blended)"]],"Offline"),
+ S("probation","Pernah masuk masa percobaan (probation)?",NY,"No"),
+ S("teacher_consult","Berkonsultasi dengan dosen soal masalah akademik?",YN,"Yes"),
+ S("co_curriculum","Aktif di kegiatan ko-kurikuler?",YN,"Yes")]},
+{title:"Faktor lingkungan",sub:"Kondisi pribadi dan sekitarmu.",cls:"env",fields:[
+ S("gender","Gender",[["Male","Laki-laki"],["Female","Perempuan"]],"Male"),
+ R("age","Usia",17,35,1,21," tahun"),
+ S("semester","Semester",[1,2,3,4,5,6,7,8].map(n=>[String(n),"Semester "+n]),"3"),
+ S("scholarship","Penerima beasiswa prestasi?",NY,"No"),
+ S("english_prof","Kemampuan bahasa Inggris",[["Basic","Dasar"],["Intermediate","Menengah"],["Advanced","Mahir"]],"Intermediate"),
+ S("living_with","Tinggal bersama",[["Family","Keluarga"],["Friends","Teman"],["Alone","Sendiri"]],"Family"),
+ S("health_issue","Punya masalah kesehatan?",NY,"No"),
+ {k:"family_income",l:"Pendapatan keluarga per bulan (angka)",t:"number",v:50000},
+ S("personal_pc","Punya komputer/laptop pribadi?",YN,"Yes"),
+ S("relationship","Status hubungan",[["Single","Single"],["In Relationship","Berpacaran"]],"Single"),
+ S("smartphone","Memakai smartphone?",YN,"Yes"),
+ S("disability","Punya disabilitas fisik?",NY,"No"),
+ S("transportation","Memakai transportasi kampus?",YN,"Yes")]}];
+const $=id=>document.getElementById(id);
+const unit={};
+$("groups").innerHTML=GROUPS.map(g=>`<section class="group ${g.cls}"><h2>${g.title}</h2><p class="sub">${g.sub}</p>${g.fields.map(f=>{
+ if(f.t==="range"){unit[f.k]=f.u;return `<div class="f"><label for="${f.k}">${f.l}<output id="o_${f.k}">${f.v}${f.u}</output></label><input type="range" id="${f.k}" min="${f.min}" max="${f.max}" step="${f.step}" value="${f.v}"></div>`}
+ if(f.t==="select")return `<div class="f"><label for="${f.k}">${f.l}</label><select id="${f.k}">${f.o.map(o=>`<option value="${o[0]}"${o[0]===f.v?" selected":""}>${o[1]}</option>`).join("")}</select></div>`;
+ return `<div class="f"><label for="${f.k}">${f.l}</label><input type="number" id="${f.k}" min="0" max="50000000" step="1000" value="${f.v}"></div>`}).join("")}</section>`).join("");
+document.querySelectorAll("input[type=range]").forEach(i=>i.addEventListener("input",()=>$("o_"+i.id).textContent=i.value+unit[i.id]));
+
+// gauge: 0-2.75 rose, 2.75-3.5 amber, 3.5-4 mint
+const pt=v=>{const a=Math.PI*(1-v/4);return[120+100*Math.cos(a),120-100*Math.sin(a)]};
+const arc=(a,b,c)=>{const p=pt(a),q=pt(b);return `<path d="M${p[0]} ${p[1]} A100 100 0 0 1 ${q[0]} ${q[1]}" stroke="${c}"/>`};
+$("arcs").innerHTML=arc(0,2.74,"#D9475F")+arc(2.76,3.49,"#E8A02B")+arc(3.51,4,"#1FA37F");
+
+const T={
+ high:{c:"high",n:"Performa tinggi",i:v=>`Pola kebiasaanmu mengarah ke performa akademik yang sangat baik (CGPA ${v}).`,t:["Pertahankan konsistensi belajar","Optimalkan pengembangan skill","Jadilah mentor bagi teman"]},
+ mid:{c:"mid",n:"Performa sedang",i:v=>`Kamu berada di jalur yang cukup baik (CGPA ${v}), dan masih bisa ditingkatkan.`,t:["Tambah jam belajar harian","Kurangi waktu media sosial","Rutin konsultasi dengan dosen"]},
+ low:{c:"low",n:"Perlu perhatian",i:v=>`Prediksi CGPA ${v} menunjukkan perlunya perhatian lebih pada kebiasaan belajar.`,t:["Hubungi dosen pembimbing","Atur ulang jadwal belajar","Kurangi kegiatan non-akademik"]}};
+
+$("form").addEventListener("submit",async e=>{
+ e.preventDefault();$("err").hidden=true;
+ const data={};GROUPS.forEach(g=>g.fields.forEach(f=>{const v=$(f.k).value;data[f.k]=(f.t==="select")?v:Number(v)}));
+ data.semester=Number($("semester").value);
+ const btn=$("go");btn.disabled=true;btn.textContent="Memprediksi…";
+ try{
+  const r=await fetch("/api/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+  const j=await r.json();if(!r.ok)throw new Error(j.error||"Terjadi kesalahan");
+  show(j.cgpa);
+ }catch(x){$("err").textContent="Prediksi gagal: "+x.message+". Coba lagi, atau periksa file best_model.pkl dan versi scikit-learn di Vercel.";$("err").hidden=false}
+ btn.disabled=false;btn.textContent="Prediksi CGPA";
+});
+function show(v){
+ const k=v>=3.5?"high":v>=2.75?"mid":"low",t=T[k],s=v.toFixed(2);
+ $("needle").style.opacity=1;$("needle").style.transform=`rotate(${v/4*180}deg)`;
+ $("num").textContent=s;
+ $("out").innerHTML=`<span class="chip ${t.c}">${t.n}</span><p class="interp">${t.i(s)}</p><ul class="tips">${t.t.map(x=>`<li>${x}</li>`).join("")}</ul><p class="note">Ini perkiraan tren dari data survei, bukan nilai pasti. Model hanya menjelaskan sebagian variasi CGPA.</p>`;
+ if(matchMedia("(max-width:860px)").matches)document.querySelector("aside").scrollIntoView({behavior:"smooth"});
+}
+</script>
+</body>
+</html>

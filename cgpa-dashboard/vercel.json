@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "public",
+  "functions": {
+    "api/predict.py": { "includeFiles": "best_model.pkl", "maxDuration": 15, "memory": 1024 }
+  }
+}
