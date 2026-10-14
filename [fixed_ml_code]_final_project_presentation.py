@@ -887,8 +887,6 @@ with open("best_model.pkl", "wb") as f:
 
 print("Model disimpan!")
 
-pip install streamlit pyngrok -q
-
 # Commented out IPython magic to ensure Python compatibility.
 # %%writefile app.py
 # import streamlit as st
