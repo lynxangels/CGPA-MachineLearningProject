@@ -1,6 +1,0 @@
-# GANTI scikit-learn dengan versi yang sama persis dengan Colab kamu, contoh: scikit-learn==1.6.1
-# (cek di Colab: import sklearn; print(sklearn.__version__))
-scikit-learn
-pandas
-numpy
-scipy

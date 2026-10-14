@@ -1,9 +1,0 @@
-[project]
-name = "cgpa-machine-learning-project"
-version = "0.1.0"
-description = "CGPA Machine Learning Project on Vercel"
-requires-python = ">=3.10"
-dependencies = []
-
-[tool.vercel]
-entrypoint = "api.predict:handler"
