@@ -3,4 +3,8 @@ scikit-learn
 pandas
 numpy
 joblib
+pyngrok
 xgboost
+lightgbm
+matplotlib
+seaborn
