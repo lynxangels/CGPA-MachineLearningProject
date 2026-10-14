@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "public",
+  "functions": {
+    "api/predict.py": { "includeFiles": "model.json", "maxDuration": 15 }
+  }
+}
